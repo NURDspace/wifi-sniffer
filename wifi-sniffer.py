@@ -8,7 +8,7 @@
 
 tty       = '/dev/ttyUSB0'   # you may want to change this
 
-mqtt_host = '192.168.64.1'   # you may want to change this
+mqtt_host = 'mqtt.vm.nurd.space'   # you may want to change this
 
 
 import json
@@ -42,7 +42,7 @@ while True:
         ssid    = parts[5]
 
         if mac2 == 'ff:ff:ff:ff:ff:ff':
-            mac = mac1 if mac2 == 'ff:ff:ff:ff:ff:ff' else mac2
+            mac = mac1 if mac3 == 'ff:ff:ff:ff:ff:ff' else mac3
 
         else:
             mac = mac2
