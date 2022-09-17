@@ -16,6 +16,10 @@ import paho.mqtt.publish as publish
 import serial
 import time
 
+mac_lookup = dict()
+
+for line in open('mac-vendor.txt', 'r'):
+    mac_lookup[line[0:8].replace('-', '').lower()] = line[9:].strip()
 
 s = serial.Serial(tty, 115200, timeout=1)
 
@@ -48,7 +52,15 @@ while True:
             mac = mac2
 
         if not mac in history:
-            history[mac] = { 'rssi' : rssi, 'channel' : channel, 'mac' : mac, 'ssid' : ssid }
+            lookup_str = mac[0:8].replace(':', '')
+
+            if lookup_str in mac_lookup:
+                vendor     = mac_lookup[lookup_str]
+
+            else:
+                vendor = lookup_str
+
+            history[mac] = { 'rssi' : rssi, 'channel' : channel, 'mac' : mac, 'ssid' : ssid, 'vendor' : vendor  }
 
         else:
             history[mac]['rssi'] = rssi
@@ -56,9 +68,9 @@ while True:
         if prev != mac and (not 'ts' in history[mac] or now - history[mac]['ts'] >= 30):
             prev = mac
 
-            print(history[mac])
-
             history[mac]['ts'] = now
+
+            print(history[mac])
 
             publish.single('wifi-sniffer', hostname=mqtt_host, payload=json.dumps(history[mac])) 
 
